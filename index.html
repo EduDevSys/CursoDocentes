@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompts Docentes · ADITECH · CECyTECH</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* ── TOKENS ─────────────────────────────────────────── */
+:root {
+  --bg:        #000000;
+  --surface:   #0a0a0a;
+  --card:      #111827;
+  --border:    #1f2937;
+  --cyan:      #00f0ff;
+  --gold:      #ffd700;
+  --green:     #00ff94;
+  --purple:    #c084fc;
+  --danger:    #ff2d55;
+  --orange:    #ff6b00;
+  --white:     #ffffff;
+  --muted:     #6b7280;
+  --font-size: 15px;
+  --radius:    14px;
+}
+
+/* ── RESET ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── HERO ────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.25rem 5rem;
+  overflow: hidden;
+}
+
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,240,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,240,255,.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  animation: pulse 8s ease-in-out infinite;
+}
+.orb-1 { width: 500px; height: 500px; background: rgba(0,240,255,.12); top:-150px; right:-150px; }
+.orb-2 { width: 400px; height: 400px; background: rgba(192,132,252,.1); bottom:-100px; left:-100px; animation-delay:3s; }
+@keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(0,240,255,.08);
+  border: 1px solid rgba(0,240,255,.3);
+  border-radius: 100px;
+  padding: .35rem 1rem;
+  font-size: .75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  margin-bottom: .75rem;
+}
+.hero-title span { color: var(--cyan); }
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: var(--muted);
+  max-width: 580px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+.hero-subtitle strong { color: var(--white); }
+
+.hero-chips {
+  display: flex; flex-wrap: wrap; gap: .6rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.chip {
+  padding: .3rem .9rem;
+  border-radius: 100px;
+  font-size: .75rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+.chip-cyan   { color: var(--cyan);   border-color: rgba(0,240,255,.4);   background: rgba(0,240,255,.07); }
+.chip-gold   { color: var(--gold);   border-color: rgba(255,215,0,.4);   background: rgba(255,215,0,.07); }
+.chip-purple { color: var(--purple); border-color: rgba(192,132,252,.4); background: rgba(192,132,252,.07); }
+
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  color: var(--muted); font-size: .72rem; letter-spacing: 1px;
+}
+.scroll-hint span { width: 1px; height: 40px; background: linear-gradient(var(--cyan), transparent); }
+
+/* ── FONT SIZE CONTROL ──────────────────────────────── */
+.font-control {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(0,0,0,.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: .6rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: .6rem;
+}
+.font-control-label {
+  font-size: .78rem; color: var(--muted);
+  display: flex; align-items: center; gap: .5rem;
+  white-space: nowrap;
+}
+.font-control-label span { color: var(--cyan); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+.slider-wrap {
+  display: flex; align-items: center; gap: .6rem; flex: 1; max-width: 280px;
+}
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  flex: 1; height: 4px; border-radius: 2px;
+  background: var(--border); outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--cyan); border: 2px solid var(--bg);
+  box-shadow: 0 0 8px var(--cyan);
+}
+input[type=range]::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--cyan); border: 2px solid var(--bg);
+  box-shadow: 0 0 8px var(--cyan);
+}
+.font-icon { font-size: .8rem; color: var(--muted); }
+.font-icon.lg { font-size: 1.1rem; }
+
+/* Nav pills de categorías */
+.cat-nav {
+  display: flex; gap: .5rem; overflow-x: auto;
+  padding: 0; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.cat-nav::-webkit-scrollbar { display: none; }
+.cat-pill {
+  flex-shrink: 0;
+  background: none; border: 1px solid var(--border);
+  border-radius: 100px; padding: .28rem .8rem;
+  font-size: .72rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.cat-pill:hover, .cat-pill.active {
+  background: var(--cyan); border-color: var(--cyan); color: #000;
+}
+
+/* ── MAIN LAYOUT ─────────────────────────────────────── */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+/* ── SECTION ─────────────────────────────────────────── */
+.section { margin-bottom: 3rem; }
+
+.section-header {
+  display: flex; align-items: center; gap: .75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-icon {
+  font-size: 1.6rem;
+  width: 2.4rem; height: 2.4rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
+.section-count {
+  margin-left: auto;
+  font-size: .72rem; font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  background: var(--surface);
+  padding: .2rem .6rem; border-radius: 100px;
+  border: 1px solid var(--border);
+}
+
+/* ── PROMPT CARDS GRID ───────────────────────────────── */
+.prompts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 1rem;
+}
+
+/* ── PROMPT CARD ─────────────────────────────────────── */
+.prompt-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.1rem .9rem;
+  display: flex; flex-direction: column; gap: .75rem;
+  transition: border-color .2s, transform .15s;
+  position: relative; overflow: hidden;
+}
+.prompt-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  opacity: 0; transition: opacity .2s;
+}
+.prompt-card:hover { transform: translateY(-2px); }
+.prompt-card:hover::before { opacity: 1; }
+
+/* Color accents por categoría */
+.cat-1 { border-top-color: var(--cyan);   } .cat-1::before { background: var(--cyan); }
+.cat-2 { border-top-color: var(--gold);   } .cat-2::before { background: var(--gold); }
+.cat-3 { border-top-color: var(--purple); } .cat-3::before { background: var(--purple); }
+.cat-4 { border-top-color: var(--green);  } .cat-4::before { background: var(--green); }
+.cat-5 { border-top-color: var(--orange); } .cat-5::before { background: var(--orange); }
+.cat-6 { border-top-color: var(--danger); } .cat-6::before { background: var(--danger); }
+.cat-7 { border-top-color: var(--purple); } .cat-7::before { background: var(--purple); }
+
+.prompt-card:hover.cat-1 { border-color: var(--cyan); }
+.prompt-card:hover.cat-2 { border-color: var(--gold); }
+.prompt-card:hover.cat-3 { border-color: var(--purple); }
+.prompt-card:hover.cat-4 { border-color: var(--green); }
+.prompt-card:hover.cat-5 { border-color: var(--orange); }
+.prompt-card:hover.cat-6 { border-color: var(--danger); }
+.prompt-card:hover.cat-7 { border-color: var(--purple); }
+
+.prompt-name {
+  font-weight: 700;
+  line-height: 1.3;
+  font-size: 1em;
+}
+
+.tool-badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .68rem; font-weight: 600;
+  padding: .15rem .55rem; border-radius: 100px;
+  border: 1px solid; margin-left: auto; flex-shrink: 0;
+}
+.tool-chatgpt  { color: #10a37f; border-color: rgba(16,163,127,.4); background: rgba(16,163,127,.08); }
+.tool-claude   { color: var(--purple); border-color: rgba(192,132,252,.4); background: rgba(192,132,252,.08); }
+.tool-perp     { color: var(--gold); border-color: rgba(255,215,0,.4); background: rgba(255,215,0,.08); }
+.tool-gemini   { color: #4285f4; border-color: rgba(66,133,244,.4); background: rgba(66,133,244,.08); }
+.tool-cualq    { color: var(--muted); border-color: var(--border); }
+
+/* Inputs del prompt */
+.prompt-inputs { display: flex; flex-direction: column; gap: .45rem; }
+
+.input-group { display: flex; flex-direction: column; gap: .2rem; }
+.input-label {
+  font-size: .7rem; color: var(--muted); font-weight: 600;
+  letter-spacing: .5px; text-transform: uppercase;
+}
+.input-group input, .input-group select {
+  background: rgba(0,0,0,.6);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .45rem .7rem;
+  color: var(--white);
+  font-size: .88em;
+  font-family: 'Space Grotesk', sans-serif;
+  outline: none;
+  transition: border-color .2s;
+  width: 100%;
+}
+.input-group input:focus, .input-group select:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(0,240,255,.1);
+}
+.input-group input::placeholder { color: var(--muted); }
+.input-group select option { background: #111; }
+
+/* Vista previa del prompt */
+.prompt-preview {
+  background: rgba(0,0,0,.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .7rem .8rem;
+  font-size: .8em;
+  font-family: 'JetBrains Mono', monospace;
+  color: #a5c8ff;
+  line-height: 1.6;
+  min-height: 3.5rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: none;
+}
+.prompt-preview.visible { display: block; }
+
+/* Botones acción */
+.card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+}
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: .35rem;
+  border: none; border-radius: 8px; cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .82em; font-weight: 700;
+  padding: .55rem .7rem;
+  transition: all .18s;
+}
+.btn-generate {
+  background: var(--cyan); color: #000;
+}
+.btn-generate:hover { background: #00d4e6; }
+.btn-copy {
+  background: var(--surface); color: var(--white);
+  border: 1px solid var(--border);
+}
+.btn-copy:hover { border-color: var(--cyan); color: var(--cyan); }
+.btn-copy.copied { background: rgba(0,255,148,.1); border-color: var(--green); color: var(--green); }
+
+.btn-open {
+  grid-column: 1 / -1;
+  background: rgba(0,240,255,.08);
+  border: 1px solid rgba(0,240,255,.25);
+  color: var(--cyan);
+  font-size: .78em;
+  padding: .45rem;
+}
+.btn-open:hover { background: rgba(0,240,255,.15); }
+
+/* ── FOOTER ──────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .8rem;
+}
+footer strong { color: var(--cyan); }
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .hero-title { letter-spacing: -1px; }
+  .font-control { flex-direction: column; align-items: flex-start; }
+  .cat-nav { width: 100%; }
+  .slider-wrap { max-width: 100%; width: 100%; }
+  .card-actions { grid-template-columns: 1fr; }
+  .btn-open { grid-column: auto; }
+}
+
+/* ── ANIMATIONS ──────────────────────────────────────── */
+.fade-in {
+  opacity: 0; transform: translateY(16px);
+  animation: fadeUp .4s ease forwards;
+}
+@keyframes fadeUp { to { opacity:1; transform:none; } }
+
+.section[data-hidden] { display: none; }
+
+/* toast */
+.toast {
+  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--green); color: #000;
+  padding: .55rem 1.4rem; border-radius: 100px;
+  font-weight: 700; font-size: .88rem;
+  opacity: 0; pointer-events: none;
+  transition: all .25s;
+  z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── MÓDULO DETECTOR IA ─────────────────────────────── */
+.detector-hero {
+  background: linear-gradient(135deg, #0a0015 0%, #001a10 100%);
+  border: 2px solid #2d1060;
+  border-radius: 18px;
+  padding: 1.5rem 1.25rem 1.25rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.detector-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at top left, rgba(192,132,252,.1) 0%, transparent 60%),
+              radial-gradient(ellipse at bottom right, rgba(0,255,148,.07) 0%, transparent 60%);
+  pointer-events: none;
+}
+.detector-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  font-weight: 800;
+  margin-bottom: .4rem;
+  position: relative;
+}
+.detector-hero-sub {
+  font-size: .85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  position: relative;
+  max-width: 680px;
+}
+
+/* Tabs dentro del detector */
+.detect-tabs {
+  display: flex; gap: .5rem; flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.detect-tab {
+  flex: 1; min-width: 120px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: .6rem .5rem;
+  cursor: pointer; text-align: center;
+  font-size: .78rem; font-weight: 700;
+  color: var(--muted);
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all .2s; line-height: 1.3;
+}
+.detect-tab:hover { border-color: var(--purple); color: var(--purple); }
+.detect-tab.active {
+  background: rgba(192,132,252,.12);
+  border-color: var(--purple);
+  color: var(--purple);
+}
+
+/* Panel del detector */
+.detect-panel { display: none; }
+.detect-panel.active { display: block; }
+
+/* Señales visuales */
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: .75rem;
+  margin: 1rem 0;
+}
+.signal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: .9rem 1rem;
+  display: flex; gap: .75rem; align-items: flex-start;
+  transition: border-color .2s;
+}
+.signal-card:hover { border-color: var(--purple); }
+.signal-icon {
+  font-size: 1.3rem; flex-shrink: 0; margin-top: .1rem;
+}
+.signal-text { font-size: .83rem; line-height: 1.5; color: var(--white); }
+.signal-text strong { color: var(--purple); display: block; margin-bottom: .15rem; font-size: .8rem; }
+
+/* Evaluación express */
+.express-card {
+  background: var(--card);
+  border: 2px solid;
+  border-radius: 14px;
+  padding: 1.1rem 1.1rem .9rem;
+  display: flex; flex-direction: column; gap: .75rem;
+  position: relative; overflow: hidden;
+}
+.express-card.level-1 { border-color: var(--green);  }
+.express-card.level-2 { border-color: var(--gold);   }
+.express-card.level-3 { border-color: var(--orange); }
+.express-card.level-4 { border-color: var(--purple); }
+.express-card.level-5 { border-color: var(--cyan);   }
+
+.express-level {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .7rem; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: .1rem;
+}
+.express-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1em; font-weight: 800;
+  line-height: 1.3;
+}
+.express-desc {
+  font-size: .8rem; color: var(--muted); line-height: 1.5;
+}
+.express-tag {
+  font-size: .68rem; font-weight: 700;
+  padding: .18rem .6rem; border-radius: 100px;
+  border: 1px solid; display: inline-block; margin-left: auto;
+}
+
+/* Semáforo de señales */
+.semaforo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .75rem;
+  margin: 1rem 0;
+}
+.semaforo-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: .9rem .75rem;
+  text-align: center;
+}
+.semaforo-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  margin: 0 auto .5rem;
+}
+.semaforo-label {
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+  margin-bottom: .3rem;
+}
+.semaforo-desc { font-size: .75rem; color: var(--muted); line-height: 1.4; }
+
+/* Protocolo steps */
+.protocol-steps {
+  display: flex; flex-direction: column; gap: .6rem;
+  margin: 1rem 0;
+}
+.protocol-step {
+  display: flex; gap: .85rem; align-items: flex-start;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .75rem .9rem;
+  transition: border-color .2s;
+}
+.protocol-step:hover { border-color: var(--cyan); }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0,240,255,.12);
+  border: 1px solid rgba(0,240,255,.3);
+  color: var(--cyan); font-weight: 700; font-size: .8rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: .1rem;
+}
+.step-content { flex: 1; }
+.step-title { font-weight: 700; font-size: .88rem; margin-bottom: .2rem; }
+.step-desc { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+
+@media (max-width: 480px) {
+  .semaforo { grid-template-columns: 1fr; }
+  .detect-tabs { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══════════════════════════════════════════ -->
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="hero-badge">⚡ ADITECH · CECyTECH · Tuxtla Gutiérrez</div>
+
+  <h1 class="hero-title">
+    Inteligencia Artificial<br>
+    <span>Aplicada a la Educación</span>
+  </h1>
+
+  <p class="hero-subtitle">
+    Prompts listos para usar en el aula.<br>
+    <strong>Rellena los campos → copia → pega en tu IA favorita.</strong>
+  </p>
+
+  <div class="hero-chips">
+    <span class="chip chip-cyan">ChatGPT</span>
+    <span class="chip chip-purple">Claude</span>
+    <span class="chip chip-gold">Perplexity</span>
+    <span class="chip chip-cyan">Gemini</span>
+  </div>
+
+  <div class="scroll-hint">
+    EXPLORAR PROMPTS
+    <span></span>
+  </div>
+</header>
+
+<!-- ═══ FONT CONTROL + NAV ══════════════════════════════ -->
+<div class="font-control" id="fontBar">
+  <div class="slider-wrap">
+    <span class="font-icon">A</span>
+    <input type="range" id="fontSlider" min="12" max="22" value="15" step="1"
+           aria-label="Tamaño de texto">
+    <span class="font-icon lg">A</span>
+    <div class="font-control-label">
+      Texto: <span id="fontVal">15</span>px
+    </div>
+  </div>
+
+  <nav class="cat-nav" id="catNav" aria-label="Filtrar categorías">
+    <button class="cat-pill active" data-cat="all">Todas</button>
+    <button class="cat-pill" data-cat="1">📋 Control</button>
+    <button class="cat-pill" data-cat="2">📝 Planeación</button>
+    <button class="cat-pill" data-cat="3">📸 Desde foto</button>
+    <button class="cat-pill" data-cat="4">🔍 Evaluación</button>
+    <button class="cat-pill" data-cat="5">🤖 Alumno+IA</button>
+    <button class="cat-pill" data-cat="6">🔧 Técnico</button>
+    <button class="cat-pill" data-cat="7">🎬 Innovación</button>
+    <button class="cat-pill" data-cat="8">🕵️ Detector IA</button>
+  </nav>
+</div>
+
+<!-- ═══ MAIN ════════════════════════════════════════════ -->
+<main id="mainContent">
+
+<!-- ───── CAT 1: Control Escolar ──────────────────────── -->
+<section class="section fade-in" data-section="1">
+  <div class="section-header">
+    <div class="section-icon">📋</div>
+    <h2 class="section-title" style="color:var(--cyan)">Control Escolar</h2>
+    <span class="section-count">5 prompts</span>
+  </div>
+  <div class="prompts-grid">
+
+    <!-- Prompt 1.1 -->
+    <div class="prompt-card cat-1">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Lista de asistencia en Excel con alerta de cumpleaños</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group">
+          <label class="input-label">Materia / Grupo</label>
+          <input type="text" placeholder="Ej. Matemáticas 3° A" data-field="materia_1_1">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Número de alumnos</label>
+          <input type="number" placeholder="Ej. 35" min="1" max="60" data-field="alumnos_1_1">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Ciclo escolar</label>
+          <input type="text" placeholder="Ej. 2024-2025" data-field="ciclo_1_1">
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-1-1"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('1-1')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-1-1" onclick="copyPrompt('1-1')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('1-1','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <!-- Prompt 1.2 -->
+    <div class="prompt-card cat-1">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Control de cooperaciones o cuotas por alumno</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group">
+          <label class="input-label">Grupo</label>
+          <input type="text" placeholder="Ej. 2° B" data-field="grupo_1_2">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Concepto a cobrar</label>
+          <input type="text" placeholder="Ej. Cooperación de material de laboratorio" data-field="concepto_1_2">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Monto (MXN)</label>
+          <input type="text" placeholder="Ej. $50" data-field="monto_1_2">
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-1-2"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('1-2')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-1-2" onclick="copyPrompt('1-2')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('1-2','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <!-- Prompt 1.3 -->
+    <div class="prompt-card cat-1">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Inventario de materiales y equipo escolar</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group">
+          <label class="input-label">Área / Taller</label>
+          <input type="text" placeholder="Ej. Laboratorio de física" data-field="area_1_3">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Tipos de equipo (separados por coma)</label>
+          <input type="text" placeholder="Ej. microscopios, probetas, mecheros" data-field="equipo_1_3">
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-1-3"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('1-3')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-1-3" onclick="copyPrompt('1-3')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('1-3','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <!-- Prompt 1.4 -->
+    <div class="prompt-card cat-1">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Registro de calificaciones con promedios automáticos</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group">
+          <label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Química" data-field="mat_1_4">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Número de bimestres / parciales</label>
+          <input type="number" placeholder="Ej. 3" min="1" max="6" data-field="bim_1_4">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Criterios de evaluación</label>
+          <input type="text" placeholder="Ej. examen 60%, tarea 20%, participación 20%" data-field="crit_1_4">
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-1-4"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('1-4')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-1-4" onclick="copyPrompt('1-4')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('1-4','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <!-- Prompt 1.5 -->
+    <div class="prompt-card cat-1">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Reporte de alumnos en riesgo de reprobación</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group">
+          <label class="input-label">Materia y grupo</label>
+          <input type="text" placeholder="Ej. Física 1° C" data-field="mg_1_5">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Calificación mínima aprobatoria</label>
+          <input type="number" placeholder="Ej. 6" min="5" max="10" data-field="min_1_5">
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-1-5"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('1-5')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-1-5" onclick="copyPrompt('1-5')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('1-5','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ───── CAT 2: Planeación Didáctica ─────────────────── -->
+<section class="section fade-in" data-section="2" style="animation-delay:.08s">
+  <div class="section-header">
+    <div class="section-icon">📝</div>
+    <h2 class="section-title" style="color:var(--gold)">Planeación Didáctica</h2>
+    <span class="section-count">5 prompts</span>
+  </div>
+  <div class="prompts-grid">
+
+    <div class="prompt-card cat-2">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Planeación didáctica completa por bloque</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Biología" data-field="mat_2_1"></div>
+        <div class="input-group"><label class="input-label">Grado</label>
+          <input type="text" placeholder="Ej. 2° semestre" data-field="grado_2_1"></div>
+        <div class="input-group"><label class="input-label">Tema / Bloque</label>
+          <input type="text" placeholder="Ej. Célula y sus funciones" data-field="tema_2_1"></div>
+        <div class="input-group"><label class="input-label">Número de sesiones</label>
+          <input type="number" placeholder="Ej. 4" min="1" max="20" data-field="ses_2_1"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-2-1"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('2-1')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-2-1" onclick="copyPrompt('2-1')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('2-1','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-2">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Actividad de inicio, desarrollo y cierre para una clase</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materia y tema</label>
+          <input type="text" placeholder="Ej. Historia · Revolución Mexicana" data-field="mt_2_2"></div>
+        <div class="input-group"><label class="input-label">Duración de la clase (minutos)</label>
+          <input type="number" placeholder="Ej. 50" min="30" max="120" data-field="dur_2_2"></div>
+        <div class="input-group"><label class="input-label">Número de alumnos</label>
+          <input type="number" placeholder="Ej. 40" data-field="al_2_2"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-2-2"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('2-2')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-2-2" onclick="copyPrompt('2-2')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('2-2','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-2">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Preguntas detonadoras para un tema</span>
+        <span class="tool-badge tool-cualq">✦ Cualquier IA</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema</label>
+          <input type="text" placeholder="Ej. Energías renovables" data-field="tema_2_3"></div>
+        <div class="input-group"><label class="input-label">Nivel de los alumnos</label>
+          <select data-field="nivel_2_3">
+            <option value="">Selecciona nivel…</option>
+            <option>Básico (1° semestre)</option>
+            <option>Intermedio (2°–3° semestre)</option>
+            <option>Avanzado (4°–6° semestre)</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="input-label">Cantidad de preguntas</label>
+          <input type="number" placeholder="Ej. 5" min="3" max="15" data-field="cant_2_3"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-2-3"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('2-3')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-2-3" onclick="copyPrompt('2-3')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('2-3','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-2">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Adaptar contenido a diferentes estilos de aprendizaje</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema a adaptar</label>
+          <input type="text" placeholder="Ej. Ley de Newton" data-field="tema_2_4"></div>
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Física" data-field="mat_2_4"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-2-4"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('2-4')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-2-4" onclick="copyPrompt('2-4')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('2-4','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-2">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Canción didáctica para memorizar un tema</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema / Concepto clave</label>
+          <input type="text" placeholder="Ej. La tabla periódica" data-field="tema_2_5"></div>
+        <div class="input-group"><label class="input-label">Ritmo o género musical</label>
+          <input type="text" placeholder="Ej. reggaeton, cumbia, rap" data-field="ritmo_2_5"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-2-5"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('2-5')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-2-5" onclick="copyPrompt('2-5')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('2-5','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ───── CAT 3: Desde foto o documento ───────────────── -->
+<section class="section fade-in" data-section="3" style="animation-delay:.12s">
+  <div class="section-header">
+    <div class="section-icon">📸</div>
+    <h2 class="section-title" style="color:var(--purple)">Generar desde foto o documento</h2>
+    <span class="section-count">4 prompts</span>
+  </div>
+  <div class="prompts-grid">
+
+    <div class="prompt-card cat-3">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Examen a partir de apuntes o libro (foto → preguntas)</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Química" data-field="mat_3_1"></div>
+        <div class="input-group"><label class="input-label">Tipo de preguntas</label>
+          <select data-field="tipo_3_1">
+            <option value="">Selecciona tipo…</option>
+            <option>Opción múltiple</option>
+            <option>Verdadero o falso</option>
+            <option>Preguntas abiertas</option>
+            <option>Completar espacios</option>
+            <option>Mix de todos</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="input-label">Número de preguntas</label>
+          <input type="number" placeholder="Ej. 10" min="5" max="50" data-field="num_3_1"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-3-1"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('3-1')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-3-1" onclick="copyPrompt('3-1')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('3-1','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-3">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Convertir lectura en actividad de comprensión lectora</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Español" data-field="mat_3_2"></div>
+        <div class="input-group"><label class="input-label">Nivel de dificultad</label>
+          <select data-field="dif_3_2">
+            <option value="">Selecciona nivel…</option>
+            <option>Básico</option><option>Intermedio</option><option>Avanzado</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-3-2"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('3-2')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-3-2" onclick="copyPrompt('3-2')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('3-2','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-3">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Glosario de términos clave de un tema</span>
+        <span class="tool-badge tool-cualq">✦ Cualquier IA</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema</label>
+          <input type="text" placeholder="Ej. Genética y ADN" data-field="tema_3_3"></div>
+        <div class="input-group"><label class="input-label">Número de términos</label>
+          <input type="number" placeholder="Ej. 15" min="5" max="40" data-field="num_3_3"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-3-3"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('3-3')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-3-3" onclick="copyPrompt('3-3')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('3-3','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-3">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Explicar concepto difícil como si tuvieran 12 años</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Concepto a explicar</label>
+          <input type="text" placeholder="Ej. Derivada en cálculo" data-field="conc_3_4"></div>
+        <div class="input-group"><label class="input-label">Usar analogía de (opcional)</label>
+          <input type="text" placeholder="Ej. videojuegos, fútbol, cocina" data-field="anal_3_4"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-3-4"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('3-4')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-3-4" onclick="copyPrompt('3-4')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('3-4','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ───── CAT 4: Evaluación ───────────────────────────── -->
+<section class="section fade-in" data-section="4" style="animation-delay:.16s">
+  <div class="section-header">
+    <div class="section-icon">🔍</div>
+    <h2 class="section-title" style="color:var(--green)">Evaluación y verificación del aprendizaje</h2>
+    <span class="section-count">4 prompts</span>
+  </div>
+  <div class="prompts-grid">
+
+    <div class="prompt-card cat-4">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">5 preguntas orales para verificar que el alumno aprendió</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema de la tarea / trabajo</label>
+          <input type="text" placeholder="Ej. La Revolución Francesa" data-field="tema_4_1"></div>
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Historia Universal" data-field="mat_4_1"></div>
+        <div class="input-group"><label class="input-label">Dificultad de preguntas</label>
+          <select data-field="dif_4_1">
+            <option value="">Selecciona…</option>
+            <option>Básica (recordar y comprender)</option>
+            <option>Media (aplicar y analizar)</option>
+            <option>Alta (evaluar y crear)</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-4-1"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('4-1')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-4-1" onclick="copyPrompt('4-1')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('4-1','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-4">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Rúbrica de evaluación por competencias</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Producto a evaluar</label>
+          <input type="text" placeholder="Ej. Maqueta del sistema solar" data-field="prod_4_2"></div>
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Ciencias" data-field="mat_4_2"></div>
+        <div class="input-group"><label class="input-label">Número de criterios</label>
+          <input type="number" placeholder="Ej. 5" min="3" max="10" data-field="crit_4_2"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-4-2"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('4-2')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-4-2" onclick="copyPrompt('4-2')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('4-2','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-4">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Banco de preguntas por tema y nivel de dificultad</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materia y tema</label>
+          <input type="text" placeholder="Ej. Matemáticas · Fracciones" data-field="mt_4_3"></div>
+        <div class="input-group"><label class="input-label">Total de preguntas</label>
+          <input type="number" placeholder="Ej. 20" min="10" max="50" data-field="tot_4_3"></div>
+        <div class="input-group"><label class="input-label">Tipo</label>
+          <select data-field="tipo_4_3">
+            <option value="">Selecciona…</option>
+            <option>Opción múltiple</option><option>Abiertas</option><option>Mix</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-4-3"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('4-3')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-4-3" onclick="copyPrompt('4-3')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('4-3','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-4">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Coevaluación entre pares para trabajo en equipo</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tipo de proyecto / actividad</label>
+          <input type="text" placeholder="Ej. Exposición oral en equipo" data-field="proy_4_4"></div>
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Comunicación" data-field="mat_4_4"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-4-4"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('4-4')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-4-4" onclick="copyPrompt('4-4')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('4-4','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ───── CAT 5: Alumno + IA ──────────────────────────── -->
+<section class="section fade-in" data-section="5" style="animation-delay:.2s">
+  <div class="section-header">
+    <div class="section-icon">🤖</div>
+    <h2 class="section-title" style="color:var(--orange)">Conciencia del alumno con IA</h2>
+    <span class="section-count">4 prompts</span>
+  </div>
+  <div class="prompts-grid">
+
+    <div class="prompt-card cat-5">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Hacer la tarea Y generar guía de estudio en una hoja</span>
+        <span class="tool-badge tool-cualq">✦ Cualquier IA</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema de la tarea</label>
+          <input type="text" placeholder="Ej. La Segunda Guerra Mundial" data-field="tema_5_1"></div>
+        <div class="input-group"><label class="input-label">Tipo de tarea</label>
+          <select data-field="tipo_5_1">
+            <option value="">Selecciona…</option>
+            <option>Ensayo</option><option>Resumen</option>
+            <option>Cuestionario</option><option>Mapa conceptual</option>
+            <option>Exposición oral</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Historia Universal" data-field="mat_5_1"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-5-1"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('5-1')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-5-1" onclick="copyPrompt('5-1')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('5-1','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-5">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Modo "ponme a prueba" para preparar examen oral</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema del examen</label>
+          <input type="text" placeholder="Ej. Fotosíntesis y respiración celular" data-field="tema_5_2"></div>
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Biología" data-field="mat_5_2"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-5-2"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('5-2')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-5-2" onclick="copyPrompt('5-2')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('5-2','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-5">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Que la IA explique el error del alumno en un ejercicio</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Álgebra" data-field="mat_5_3"></div>
+        <div class="input-group"><label class="input-label">Tipo de ejercicio</label>
+          <input type="text" placeholder="Ej. Ecuaciones de segundo grado" data-field="ej_5_3"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-5-3"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('5-3')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-5-3" onclick="copyPrompt('5-3')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('5-3','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-5">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Mapa conceptual o esquema de un tema</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema</label>
+          <input type="text" placeholder="Ej. El sistema nervioso" data-field="tema_5_4"></div>
+        <div class="input-group"><label class="input-label">Formato deseado</label>
+          <select data-field="fmt_5_4">
+            <option value="">Selecciona…</option>
+            <option>Mapa conceptual con texto</option>
+            <option>Esquema jerárquico</option>
+            <option>Lista con niveles</option>
+            <option>Diagrama de flujo en texto</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-5-4"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('5-4')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-5-4" onclick="copyPrompt('5-4')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('5-4','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ───── CAT 6: Troubleshooting ─────────────────────── -->
+<section class="section fade-in" data-section="6" style="animation-delay:.24s">
+  <div class="section-header">
+    <div class="section-icon">🔧</div>
+    <h2 class="section-title" style="color:var(--danger)">Troubleshooting técnico en el aula</h2>
+    <span class="section-count">4 prompts</span>
+  </div>
+  <div class="prompts-grid">
+
+    <div class="prompt-card cat-6">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">El cañón o proyector no enciende o no da señal</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Marca del proyector</label>
+          <input type="text" placeholder="Ej. Epson, BenQ, ViewSonic" data-field="marca_6_1"></div>
+        <div class="input-group"><label class="input-label">Problema específico</label>
+          <select data-field="prob_6_1">
+            <option value="">Selecciona…</option>
+            <option>No enciende</option>
+            <option>Enciende pero no da imagen</option>
+            <option>Imagen distorsionada o con rayas</option>
+            <option>No detecta la laptop</option>
+            <option>Pantalla azul o negra</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-6-1"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('6-1')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-6-1" onclick="copyPrompt('6-1')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('6-1','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-6">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">La computadora no conecta al WiFi de la escuela</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Sistema operativo</label>
+          <select data-field="os_6_2">
+            <option value="">Selecciona…</option>
+            <option>Windows 10</option><option>Windows 11</option>
+            <option>macOS</option><option>Chromebook</option><option>Linux</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="input-label">Síntoma</label>
+          <select data-field="sint_6_2">
+            <option value="">Selecciona…</option>
+            <option>No aparece la red WiFi</option>
+            <option>Se conecta pero sin internet</option>
+            <option>Contraseña correcta pero no entra</option>
+            <option>Se desconecta constantemente</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-6-2"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('6-2')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-6-2" onclick="copyPrompt('6-2')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('6-2','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-6">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Un programa educativo no abre o da error</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Nombre del programa</label>
+          <input type="text" placeholder="Ej. GeoGebra, Scratch, Cisco Packet Tracer" data-field="prog_6_3"></div>
+        <div class="input-group"><label class="input-label">Mensaje de error (si aplica)</label>
+          <input type="text" placeholder="Ej. 'DLL not found' o 'Access denied'" data-field="err_6_3"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-6-3"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('6-3')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-6-3" onclick="copyPrompt('6-3')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('6-3','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-6">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">La impresora no responde o imprime mal</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Marca de impresora</label>
+          <input type="text" placeholder="Ej. HP, Epson, Canon" data-field="marca_6_4"></div>
+        <div class="input-group"><label class="input-label">Tipo de conexión</label>
+          <select data-field="con_6_4">
+            <option value="">Selecciona…</option>
+            <option>USB</option><option>WiFi</option><option>Red local</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="input-label">Problema</label>
+          <select data-field="prob_6_4">
+            <option value="">Selecciona…</option>
+            <option>No aparece en la lista de impresoras</option>
+            <option>Imprime con rayas o borroso</option>
+            <option>Se atora el papel</option>
+            <option>No imprime aunque manda el trabajo</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-6-4"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('6-4')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-6-4" onclick="copyPrompt('6-4')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('6-4','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ───── CAT 7: Innovación ───────────────────────────── -->
+<section class="section fade-in" data-section="7" style="animation-delay:.28s">
+  <div class="section-header">
+    <div class="section-icon">🎬</div>
+    <h2 class="section-title" style="color:var(--purple)">Innovación y creatividad</h2>
+    <span class="section-count">4 prompts</span>
+  </div>
+  <div class="prompts-grid">
+
+    <div class="prompt-card cat-7">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Guion de cortometraje sobre zona arqueológica de Chiapas</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Zona arqueológica</label>
+          <select data-field="zona_7_1">
+            <option value="">Selecciona…</option>
+            <option>Palenque</option><option>Tonina</option><option>Chinkultic</option>
+            <option>Yaxchilán</option><option>Bonampak</option><option>Tenam Puente</option>
+          </select>
+        </div>
+        <div class="input-group"><label class="input-label">Duración total del video (minutos)</label>
+          <input type="number" placeholder="Ej. 3" min="1" max="10" data-field="dur_7_1"></div>
+        <div class="input-group"><label class="input-label">Materia relacionada</label>
+          <input type="text" placeholder="Ej. Historia de México" data-field="mat_7_1"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-7-1"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('7-1')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-7-1" onclick="copyPrompt('7-1')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('7-1','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-7">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Historia interactiva por episodios sobre un tema curricular</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Tema curricular</label>
+          <input type="text" placeholder="Ej. La Independencia de México" data-field="tema_7_2"></div>
+        <div class="input-group"><label class="input-label">Materia</label>
+          <input type="text" placeholder="Ej. Historia" data-field="mat_7_2"></div>
+        <div class="input-group"><label class="input-label">Número de episodios</label>
+          <input type="number" placeholder="Ej. 4" min="2" max="6" data-field="ep_7_2"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-7-2"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('7-2')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-7-2" onclick="copyPrompt('7-2')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('7-2','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-7">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Trivia o juego de preguntas para repasar un examen</span>
+        <span class="tool-badge tool-chatgpt">💬 ChatGPT</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materia y tema</label>
+          <input type="text" placeholder="Ej. Química · Tabla periódica" data-field="mt_7_3"></div>
+        <div class="input-group"><label class="input-label">Número de preguntas</label>
+          <input type="number" placeholder="Ej. 15" min="5" max="30" data-field="num_7_3"></div>
+        <div class="input-group"><label class="input-label">Formato</label>
+          <select data-field="fmt_7_3">
+            <option value="">Selecciona…</option>
+            <option>Quiz con 4 opciones y respuestas al final</option>
+            <option>¿Verdadero o falso? con justificación</option>
+            <option>Trivia oral (presentador + equipos)</option>
+          </select>
+        </div>
+      </div>
+      <pre class="prompt-preview" id="prev-7-3"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('7-3')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-7-3" onclick="copyPrompt('7-3')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('7-3','chatgpt')">Abrir en ChatGPT →</button>
+      </div>
+    </div>
+
+    <div class="prompt-card cat-7">
+      <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+        <span class="prompt-name">Proyecto integrador por competencias con IA</span>
+        <span class="tool-badge tool-claude">🔵 Claude</span>
+      </div>
+      <div class="prompt-inputs">
+        <div class="input-group"><label class="input-label">Materias que integra</label>
+          <input type="text" placeholder="Ej. Química, Matemáticas y Español" data-field="mats_7_4"></div>
+        <div class="input-group"><label class="input-label">Problemática o contexto local</label>
+          <input type="text" placeholder="Ej. Contaminación del río en Chiapas" data-field="prob_7_4"></div>
+        <div class="input-group"><label class="input-label">Duración del proyecto (semanas)</label>
+          <input type="number" placeholder="Ej. 3" min="1" max="8" data-field="sem_7_4"></div>
+      </div>
+      <pre class="prompt-preview" id="prev-7-4"></pre>
+      <div class="card-actions">
+        <button class="btn btn-generate" onclick="generate('7-4')">⚡ Generar prompt</button>
+        <button class="btn btn-copy" id="copy-7-4" onclick="copyPrompt('7-4')">📋 Copiar</button>
+        <button class="btn btn-open" onclick="openInAI('7-4','claude')">Abrir en Claude →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ═══ CAT 8: DETECTOR IA ══════════════════════════════ -->
+<section class="section fade-in" data-section="8" style="animation-delay:.32s">
+  <div class="section-header">
+    <div class="section-icon">🕵️</div>
+    <h2 class="section-title" style="color:var(--purple)">Detector de IA y Evaluación Express</h2>
+    <span class="section-count">5 módulos</span>
+  </div>
+
+  <!-- Hero informativo -->
+  <div class="detector-hero">
+    <p class="detector-hero-title">🎯 El objetivo no es <span style="color:var(--danger)">castigar</span> — es verificar que hubo <span style="color:var(--green)">aprendizaje real</span></p>
+    <p class="detector-hero-sub">Este módulo te da herramientas para analizar trabajos sospechosos, generar evaluaciones express, y convertir la IA en una oportunidad de aprendizaje en lugar de un problema disciplinario.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="detect-tabs">
+    <button class="detect-tab active" onclick="switchTab('signals')">🔍 Señales de IA</button>
+    <button class="detect-tab" onclick="switchTab('semaforo')">🚦 Semáforo docente</button>
+    <button class="detect-tab" onclick="switchTab('express')">⚡ Evaluación express</button>
+    <button class="detect-tab" onclick="switchTab('prompts8')">📋 Prompts detector</button>
+    <button class="detect-tab" onclick="switchTab('protocolo')">📌 Protocolo de acción</button>
+  </div>
+
+  <!-- ── PANEL 1: Señales de IA ── -->
+  <div class="detect-panel active" id="panel-signals">
+    <p style="font-size:.85rem; color:var(--muted); margin-bottom:.75rem;">Indicios frecuentes en trabajos generados con IA. Ninguno es evidencia absoluta por sí solo — evalúa el conjunto.</p>
+    <div class="signals-grid">
+      <div class="signal-card"><span class="signal-icon">🔤</span><div class="signal-text"><strong>Vocabulario fuera de nivel</strong>Usa términos que el alumno nunca emplea en clase ni en comunicación oral.</div></div>
+      <div class="signal-card"><span class="signal-icon">🔄</span><div class="signal-text"><strong>Estructura perfecta y genérica</strong>Introducción, desarrollo y conclusión impecables, pero sin opinión personal ni voz propia.</div></div>
+      <div class="signal-card"><span class="signal-icon">📏</span><div class="signal-text"><strong>Longitud inusual</strong>El trabajo es significativamente más extenso y elaborado de lo que el alumno produce normalmente.</div></div>
+      <div class="signal-card"><span class="signal-icon">🌐</span><div class="signal-text"><strong>Sin contexto local</strong>No menciona nada de Chiapas, de la escuela, del entorno del alumno aunque el tema lo permitía.</div></div>
+      <div class="signal-card"><span class="signal-icon">💬</span><div class="signal-text"><strong>Frases de cierre de IA</strong>Termina con "En conclusión, es importante reflexionar…" o frases similares que la IA usa por defecto.</div></div>
+      <div class="signal-card"><span class="signal-icon">🚫</span><div class="signal-text"><strong>Ausencia de errores</strong>Ortografía y gramática perfectas en un alumno que habitualmente comete errores básicos.</div></div>
+      <div class="signal-card"><span class="signal-icon">📖</span><div class="signal-text"><strong>Fuentes genéricas o inventadas</strong>Cita fuentes que no puede localizar o que no corresponden al año o contexto del tema.</div></div>
+      <div class="signal-card"><span class="signal-icon">🤷</span><div class="signal-text"><strong>No puede explicarlo oralmente</strong>Al preguntarle sobre su propio trabajo, titubea o no puede describir el proceso que siguió.</div></div>
+      <div class="signal-card"><span class="signal-icon">🎭</span><div class="signal-text"><strong>Voz inconsistente</strong>El inicio suena diferente al resto — como si copió parcialmente de la IA y escribió parte él.</div></div>
+    </div>
+    <div style="background:rgba(0,255,148,.06); border:1px solid rgba(0,255,148,.25); border-radius:10px; padding:.9rem 1rem; font-size:.82rem; color:var(--white); line-height:1.5;">
+      💡 <strong style="color:var(--green)">Recuerda:</strong> Detectar señales no es suficiente para concluir que hubo plagio. Usa estas señales como punto de partida para una <strong>conversación de aprendizaje</strong>, no para una sanción directa.
+    </div>
+  </div>
+
+  <!-- ── PANEL 2: Semáforo ── -->
+  <div class="detect-panel" id="panel-semaforo">
+    <p style="font-size:.85rem; color:var(--muted); margin-bottom:.75rem;">Clasifica el trabajo recibido antes de decidir qué hacer. El semáforo te ayuda a escoger la respuesta docente correcta.</p>
+    <div class="semaforo">
+      <div class="semaforo-item" style="border-color:var(--green);">
+        <div class="semaforo-dot" style="background:var(--green);"></div>
+        <div class="semaforo-label" style="color:var(--green);">Verde</div>
+        <div class="semaforo-desc">Trabajo original o con uso responsable de IA. El alumno puede explicarlo sin problemas.</div>
+      </div>
+      <div class="semaforo-item" style="border-color:var(--gold);">
+        <div class="semaforo-dot" style="background:var(--gold);"></div>
+        <div class="semaforo-label" style="color:var(--gold);">Amarillo</div>
+        <div class="semaforo-desc">Señales de IA pero no concluyente. Aplica evaluación express antes de decidir.</div>
+      </div>
+      <div class="semaforo-item" style="border-color:var(--danger);">
+        <div class="semaforo-dot" style="background:var(--danger);"></div>
+        <div class="semaforo-label" style="color:var(--danger);">Rojo</div>
+        <div class="semaforo-desc">Múltiples señales + el alumno no puede explicar su propio trabajo. Aplica protocolo de acción.</div>
+      </div>
+    </div>
+    <div style="display:grid; gap:.6rem; margin-top:.5rem;">
+      <div style="background:var(--card); border:1px solid rgba(0,255,148,.3); border-radius:10px; padding:.8rem 1rem; font-size:.82rem; line-height:1.5;">
+        <strong style="color:var(--green);">🟢 Si es Verde:</strong> Califica normalmente. Si usó IA de forma correcta, reconócelo positivamente frente al grupo — sirve de modelo.
+      </div>
+      <div style="background:var(--card); border:1px solid rgba(255,215,0,.3); border-radius:10px; padding:.8rem 1rem; font-size:.82rem; line-height:1.5;">
+        <strong style="color:var(--gold);">🟡 Si es Amarillo:</strong> Hazle 3-5 preguntas orales del módulo "Evaluación Express". Su respuesta te dará la respuesta real.
+      </div>
+      <div style="background:var(--card); border:1px solid rgba(255,45,85,.3); border-radius:10px; padding:.8rem 1rem; font-size:.82rem; line-height:1.5;">
+        <strong style="color:var(--danger);">🔴 Si es Rojo:</strong> No anules la calificación de inmediato. Aplica el Protocolo de Acción — la meta es que aprenda, no que sea castigado.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL 3: Evaluación express ── -->
+  <div class="detect-panel" id="panel-express">
+    <p style="font-size:.85rem; color:var(--muted); margin-bottom:.75rem;">Cinco niveles de evaluación express. Elige según la sospecha y el tiempo disponible. Son conversaciones, no interrogatorios.</p>
+    <div class="prompts-grid">
+
+      <div class="express-card level-1">
+        <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+          <div>
+            <div class="express-level" style="color:var(--green);">⚡ Nivel 1 · 2 minutos</div>
+            <div class="express-title">La pregunta del pasillo</div>
+          </div>
+          <span class="express-tag" style="color:var(--green); border-color:rgba(0,255,148,.4);">Sin prompt</span>
+        </div>
+        <div class="express-desc">Una sola pregunta de comprensión esencial. Si no la puede responder con sus palabras, hay algo qué revisar.</div>
+        <div style="background:rgba(0,0,0,.5); border:1px solid rgba(0,255,148,.2); border-radius:8px; padding:.65rem .8rem; font-size:.78rem; color:#a5c8ff; line-height:1.6; font-style:italic;">
+          "Dime en una oración qué aprendiste haciendo este trabajo, como si me lo explicaras a mí que no sé nada del tema."
+        </div>
+        <div style="font-size:.75rem; color:var(--muted);">✔ Si responde fluido → Verde &nbsp; ✘ Si titubea o no puede → Amarillo</div>
+      </div>
+
+      <div class="express-card level-2">
+        <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+          <div>
+            <div class="express-level" style="color:var(--gold);">⚡ Nivel 2 · 5 minutos</div>
+            <div class="express-title">3 preguntas de proceso</div>
+          </div>
+          <span class="express-tag" style="color:var(--gold); border-color:rgba(255,215,0,.4);">Oral</span>
+        </div>
+        <div class="express-desc">Preguntas sobre cómo hizo el trabajo, no sobre el contenido. Muy difíciles de improvisar sin haber trabajado.</div>
+        <div style="background:rgba(0,0,0,.5); border:1px solid rgba(255,215,0,.2); border-radius:8px; padding:.65rem .8rem; font-size:.78rem; color:#a5c8ff; line-height:1.7; font-style:italic;">
+          1. "¿Cuál fue la parte más difícil de hacer este trabajo?"<br>
+          2. "Si tuvieras que cambiar algo, ¿qué cambiarías y por qué?"<br>
+          3. "¿Qué aprendiste que no sabías antes de empezar?"
+        </div>
+        <div style="font-size:.75rem; color:var(--muted);">Quien hizo el trabajo puede responder estas sin prepararse.</div>
+      </div>
+
+      <div class="express-card level-3">
+        <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+          <div>
+            <div class="express-level" style="color:var(--orange);">⚡ Nivel 3 · 10 minutos</div>
+            <div class="express-title">Mini exposición express</div>
+          </div>
+          <span class="express-tag" style="color:var(--orange); border-color:rgba(255,107,0,.4);">Oral + visual</span>
+        </div>
+        <div class="express-desc">El alumno explica su trabajo en 3 minutos sin leer. El docente anota inconsistencias entre lo entregado y lo que dice.</div>
+        <div style="background:rgba(0,0,0,.5); border:1px solid rgba(255,107,0,.2); border-radius:8px; padding:.65rem .8rem; font-size:.78rem; color:#a5c8ff; line-height:1.7; font-style:italic;">
+          "Tienes 3 minutos. Sin leer tu trabajo, explícame: de qué trata, cuál fue la idea más importante que encontraste y cómo lo relacionas con lo que hemos visto en clase."
+        </div>
+        <div style="font-size:.75rem; color:var(--muted);">Genera el prompt de preguntas con el módulo de abajo →</div>
+      </div>
+
+      <div class="express-card level-4">
+        <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+          <div>
+            <div class="express-level" style="color:var(--purple);">⚡ Nivel 4 · 15 minutos</div>
+            <div class="express-title">Cuestionario de verificación escrito</div>
+          </div>
+          <span class="express-tag" style="color:var(--purple); border-color:rgba(192,132,252,.4);">Escrito</span>
+        </div>
+        <div class="express-desc">5 preguntas abiertas sobre el trabajo entregado. El alumno responde a mano, sin apoyos. Compara el estilo de escritura con el trabajo original.</div>
+        <div style="background:rgba(0,0,0,.5); border:1px solid rgba(192,132,252,.2); border-radius:8px; padding:.65rem .8rem; font-size:.78rem; color:#a5c8ff; line-height:1.6; font-style:italic;">
+          Usa el prompt "Generador de verificación escrita" de abajo para crear preguntas específicas según la tarea entregada.
+        </div>
+        <div style="font-size:.75rem; color:var(--muted);">Compara letra, vocabulario y profundidad entre el trabajo y las respuestas.</div>
+      </div>
+
+      <div class="express-card level-5">
+        <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+          <div>
+            <div class="express-level" style="color:var(--cyan);">⚡ Nivel 5 · En casa</div>
+            <div class="express-title">Rehacerlo con guía consciente</div>
+          </div>
+          <span class="express-tag" style="color:var(--cyan); border-color:rgba(0,240,255,.4);">Formativo</span>
+        </div>
+        <div class="express-desc">En lugar de anular, pide al alumno que rehaga el trabajo usando IA de forma consciente: tarea + guía de estudio. La nueva entrega vale más.</div>
+        <div style="background:rgba(0,0,0,.5); border:1px solid rgba(0,240,255,.2); border-radius:8px; padding:.65rem .8rem; font-size:.78rem; color:#a5c8ff; line-height:1.7; font-style:italic;">
+          "Quiero que vuelvas a hacer este trabajo, pero ahora pídele a la IA que además te genere una guía de estudio de una hoja. Entrega ambas cosas y prepárate para explicarme la guía."
+        </div>
+        <div style="font-size:.75rem; color:var(--muted);">El objetivo es aprendizaje, no castigo. Esta estrategia lo logra.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PANEL 4: Prompts detector ── -->
+  <div class="detect-panel" id="panel-prompts8">
+    <div class="prompts-grid">
+
+      <div class="prompt-card cat-7">
+        <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+          <span class="prompt-name">Analizar si un trabajo tiene indicios de ser generado por IA</span>
+          <span class="tool-badge tool-claude">🔵 Claude</span>
+        </div>
+        <div class="prompt-inputs">
+          <div class="input-group"><label class="input-label">Materia</label>
+            <input type="text" placeholder="Ej. Historia Universal" data-field="mat_8_1"></div>
+          <div class="input-group"><label class="input-label">Tipo de trabajo</label>
+            <select data-field="tipo_8_1">
+              <option value="">Selecciona…</option>
+              <option>Ensayo</option><option>Resumen</option><option>Cuestionario</option>
+              <option>Investigación</option><option>Reporte</option><option>Tarea de ejercicios</option>
+            </select>
+          </div>
+          <div class="input-group"><label class="input-label">Nivel de sospecha</label>
+            <select data-field="nivel_8_1">
+              <option value="">Selecciona…</option>
+              <option>Baja (una o dos señales)</option>
+              <option>Media (varias señales pero no concluyente)</option>
+              <option>Alta (múltiples señales claras)</option>
+            </select>
+          </div>
+        </div>
+        <pre class="prompt-preview" id="prev-8-1"></pre>
+        <div class="card-actions">
+          <button class="btn btn-generate" onclick="generate('8-1')">⚡ Generar prompt</button>
+          <button class="btn btn-copy" id="copy-8-1" onclick="copyPrompt('8-1')">📋 Copiar</button>
+          <button class="btn btn-open" onclick="openInAI('8-1','claude')">Abrir en Claude →</button>
+        </div>
+      </div>
+
+      <div class="prompt-card cat-7">
+        <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+          <span class="prompt-name">Generar preguntas orales específicas para verificar comprensión</span>
+          <span class="tool-badge tool-claude">🔵 Claude</span>
+        </div>
+        <div class="prompt-inputs">
+          <div class="input-group"><label class="input-label">Tema del trabajo entregado</label>
+            <input type="text" placeholder="Ej. La Revolución Mexicana" data-field="tema_8_2"></div>
+          <div class="input-group"><label class="input-label">Materia</label>
+            <input type="text" placeholder="Ej. Historia" data-field="mat_8_2"></div>
+          <div class="input-group"><label class="input-label">Número de preguntas</label>
+            <input type="number" placeholder="Ej. 5" min="3" max="10" data-field="num_8_2"></div>
+          <div class="input-group"><label class="input-label">Enfoque de las preguntas</label>
+            <select data-field="enf_8_2">
+              <option value="">Selecciona…</option>
+              <option>Comprensión del contenido</option>
+              <option>Proceso de elaboración</option>
+              <option>Aplicación a situaciones nuevas</option>
+              <option>Mix de todos los enfoques</option>
+            </select>
+          </div>
+        </div>
+        <pre class="prompt-preview" id="prev-8-2"></pre>
+        <div class="card-actions">
+          <button class="btn btn-generate" onclick="generate('8-2')">⚡ Generar prompt</button>
+          <button class="btn btn-copy" id="copy-8-2" onclick="copyPrompt('8-2')">📋 Copiar</button>
+          <button class="btn btn-open" onclick="openInAI('8-2','claude')">Abrir en Claude →</button>
+        </div>
+      </div>
+
+      <div class="prompt-card cat-7">
+        <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+          <span class="prompt-name">Cuestionario de verificación escrita (para aplicar a mano)</span>
+          <span class="tool-badge tool-claude">🔵 Claude</span>
+        </div>
+        <div class="prompt-inputs">
+          <div class="input-group"><label class="input-label">Tema del trabajo</label>
+            <input type="text" placeholder="Ej. Fotosíntesis" data-field="tema_8_3"></div>
+          <div class="input-group"><label class="input-label">Materia</label>
+            <input type="text" placeholder="Ej. Biología" data-field="mat_8_3"></div>
+          <div class="input-group"><label class="input-label">Tiempo disponible (minutos)</label>
+            <input type="number" placeholder="Ej. 15" min="5" max="30" data-field="tiempo_8_3"></div>
+        </div>
+        <pre class="prompt-preview" id="prev-8-3"></pre>
+        <div class="card-actions">
+          <button class="btn btn-generate" onclick="generate('8-3')">⚡ Generar prompt</button>
+          <button class="btn btn-copy" id="copy-8-3" onclick="copyPrompt('8-3')">📋 Copiar</button>
+          <button class="btn btn-open" onclick="openInAI('8-3','claude')">Abrir en Claude →</button>
+        </div>
+      </div>
+
+      <div class="prompt-card cat-7">
+        <div style="display:flex;align-items:flex-start;gap:.5rem;flex-wrap:wrap;">
+          <span class="prompt-name">Retroalimentación formativa sin sancionar — redirección consciente</span>
+          <span class="tool-badge tool-claude">🔵 Claude</span>
+        </div>
+        <div class="prompt-inputs">
+          <div class="input-group"><label class="input-label">Materia</label>
+            <input type="text" placeholder="Ej. Química" data-field="mat_8_4"></div>
+          <div class="input-group"><label class="input-label">Tipo de alumno</label>
+            <select data-field="perfil_8_4">
+              <option value="">Selecciona perfil…</option>
+              <option>Generalmente responsable, caso aislado</option>
+              <option>Con frecuencia entrega trabajos incompletos</option>
+              <option>Buen alumno pero desmotivado</option>
+              <option>Alumno en riesgo de reprobación</option>
+            </select>
+          </div>
+        </div>
+        <pre class="prompt-preview" id="prev-8-4"></pre>
+        <div class="card-actions">
+          <button class="btn btn-generate" onclick="generate('8-4')">⚡ Generar prompt</button>
+          <button class="btn btn-copy" id="copy-8-4" onclick="copyPrompt('8-4')">📋 Copiar</button>
+          <button class="btn btn-open" onclick="openInAI('8-4','claude')">Abrir en Claude →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PANEL 5: Protocolo de acción ── -->
+  <div class="detect-panel" id="panel-protocolo">
+    <p style="font-size:.85rem; color:var(--muted); margin-bottom:.75rem;">Pasos concretos de cómo actuar cuando detectas un trabajo hecho con IA. El protocolo es formativo, no punitivo.</p>
+    <div class="protocol-steps">
+      <div class="protocol-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">No reacciones en el momento</div>
+          <div class="step-desc">Si ves el trabajo y tienes sospechas, no lo comentes frente al grupo. Primero evalúa con calma usando el semáforo.</div>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Aplica el Nivel 1 de evaluación express en privado</div>
+          <div class="step-desc">Una sola pregunta conversacional al alumno. Su respuesta te dirá todo: "Cuéntame qué aprendiste haciendo este trabajo." Si no puede, pasa al nivel 2.</div>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Si hay señales claras: abre el diálogo, no el expediente</div>
+          <div class="step-desc">"Noto que este trabajo no suena como tú. No te voy a cero — quiero que me demuestres que aprendiste. ¿Puedes explicarme la idea principal?" Esta conversación vale más que cualquier sanción.</div>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Aplica la estrategia de rehacerlo conscientemente</div>
+          <div class="step-desc">Pide una nueva entrega con tarea + guía de estudio paralela. Dale una semana. El alumno que quiera recuperar su calificación tendrá que aprender de verdad.</div>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Evalúa la nueva entrega con mini exposición</div>
+          <div class="step-desc">3 minutos: el alumno explica su guía de estudio sin leer. Si puede hacerlo, aprendió. Califica eso, no la primera entrega.</div>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <div class="step-title">Documentar sin dramatizar</div>
+          <div class="step-desc">Anota brevemente lo que ocurrió en tu registro docente. Si el patrón se repite, tendrás evidencia para una conversación con el alumno, tutor o dirección — siempre desde el aprendizaje.</div>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <div class="step-title">Usa el caso como enseñanza para el grupo (sin señalar)</div>
+          <div class="step-desc">En la siguiente clase, muestra al grupo la diferencia entre un "prompt sin conciencia" y un "prompt con guía de estudio". Que todos aprendan sin que nadie sea señalado.</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:rgba(0,240,255,.06); border:1px solid rgba(0,240,255,.2); border-radius:10px; padding:.9rem 1rem; font-size:.82rem; color:var(--white); line-height:1.5; margin-top:.5rem;">
+      🎯 <strong style="color:var(--cyan);">Principio rector:</strong> La IA no desaparecerá. El docente que aprende a <strong>redirigir su uso</strong> forma mejores alumnos que el que la prohíbe. <strong>Tu poder está en la evaluación, no en la detección.</strong>
+    </div>
+  </div>
+
+</section>
+
+
+<footer>
+  Creado por <strong>ADITECH · Agencia Digital Tecnológica del Estado de Chiapas</strong><br>
+  Curso "Inteligencia Artificial Aplicada a la Educación e Innovación" · CECyTECH · 2025
+</footer>
+
+<div class="toast" id="toast">✅ ¡Prompt copiado!</div>
+
+<script>
+// ── FONT SIZE SLIDER ─────────────────────────────────────
+const slider = document.getElementById('fontSlider');
+const fontVal = document.getElementById('fontVal');
+slider.addEventListener('input', () => {
+  const v = slider.value;
+  document.documentElement.style.setProperty('--font-size', v + 'px');
+  fontVal.textContent = v;
+});
+
+// ── CATEGORY FILTER ──────────────────────────────────────
+document.getElementById('catNav').addEventListener('click', e => {
+  const pill = e.target.closest('.cat-pill');
+  if (!pill) return;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  const cat = pill.dataset.cat;
+  document.querySelectorAll('.section[data-section]').forEach(sec => {
+    if (cat === 'all' || sec.dataset.section === cat) {
+      sec.removeAttribute('data-hidden');
+    } else {
+      sec.setAttribute('data-hidden', '');
+    }
+  });
+});
+
+// ── PROMPT TEMPLATES ─────────────────────────────────────
+const templates = {
+  '1-1': (f) => `Soy docente de ${f.materia_1_1||'[MATERIA/GRUPO]'} en bachillerato tecnológico.
+Necesito que me generes una lista de asistencia profesional en Excel para ${f.alumnos_1_1||'[N° ALUMNOS]'} alumnos, ciclo escolar ${f.ciclo_1_1||'[CICLO]'}.
+
+Incluye:
+1. Columnas para cada día lectivo del bimestre (lunes a viernes)
+2. Fórmula que marque en AMARILLO automáticamente las celdas cuando un alumno cumpla años en los próximos 7 días
+3. Columna de % de asistencia con formato condicional: verde si ≥80%, rojo si <80%
+4. Fila de totales por día
+5. Instrucciones paso a paso para implementarlo
+
+Dame el código de fórmulas y el diseño de columnas listo para usar.`,
+
+  '1-2': (f) => `Soy docente del grupo ${f.grupo_1_2||'[GRUPO]'} en bachillerato.
+Necesito una hoja de control en Excel para registrar el pago de: ${f.concepto_1_2||'[CONCEPTO]'} con costo de ${f.monto_1_2||'[MONTO]'} por alumno.
+
+Incluye:
+1. Columna de nombre del alumno
+2. Columna de estado de pago (Pagado / Pendiente / Exento)
+3. Formato condicional: verde si pagó, rojo si pendiente, gris si exento
+4. Total recaudado y total pendiente en celdas visibles
+5. Columna de observaciones
+6. Fórmulas listas para copiar en Excel
+
+Dame la estructura y las fórmulas paso a paso.`,
+
+  '1-3': (f) => `Soy docente responsable del área: ${f.area_1_3||'[ÁREA/TALLER]'}.
+Necesito una hoja de inventario en Excel para los siguientes equipos y materiales: ${f.equipo_1_3||'[EQUIPOS]'}.
+
+El inventario debe incluir:
+1. Número de inventario, descripción, cantidad total, cantidad disponible, condición (Bueno/Regular/Dañado)
+2. Columna de responsable (alumno que lo usa)
+3. Fecha de última revisión
+4. Alerta en rojo si la cantidad disponible es 0
+5. Fórmulas de resumen: total de equipos, % en buen estado
+6. Instrucciones para usar y mantener actualizado el inventario
+
+Dame la estructura lista para copiar en Excel.`,
+
+  '1-4': (f) => `Soy docente de ${f.mat_1_4||'[MATERIA]'} en bachillerato tecnológico.
+Necesito una hoja de calificaciones en Excel para ${f.bim_1_4||'[N° BIMESTRES]'} bimestres/parciales, con los siguientes criterios de evaluación: ${f.crit_1_4||'[CRITERIOS]'}.
+
+Incluye:
+1. Una columna por cada criterio de evaluación con su peso porcentual
+2. Fórmula automática de promedio ponderado
+3. Promedio general del bimestre
+4. Formato condicional: verde si aprueba, rojo si reprueba
+5. Promedio final del ciclo
+6. Fórmulas listas para Excel
+
+Explícame paso a paso cómo configurarlo.`,
+
+  '1-5': (f) => `Soy docente de ${f.mg_1_5||'[MATERIA Y GRUPO]'} en bachillerato tecnológico.
+La calificación mínima aprobatoria es ${f.min_1_5||'[CALIFICACIÓN MÍNIMA]'}.
+
+Necesito que me ayudes a generar:
+1. Una plantilla para identificar alumnos en riesgo de reprobación basándome en su tendencia de calificaciones
+2. Una tabla que muestre: nombre, calificaciones por parcial, promedio actual, calificación necesaria en el siguiente para pasar
+3. Una fórmula en Excel que calcule automáticamente qué necesita sacar cada alumno para aprobar
+4. Una carta o mensaje corto para enviar al tutor del alumno en riesgo
+
+Dame todo el material paso a paso, listo para usar.`,
+
+  '2-1': (f) => `Soy docente de ${f.mat_2_1||'[MATERIA]'}, grado ${f.grado_2_1||'[GRADO]'}, bachillerato tecnológico.
+Necesito una planeación didáctica completa para el tema: "${f.tema_2_1||'[TEMA/BLOQUE]'}", en ${f.ses_2_1||'[N° SESIONES]'} sesiones.
+
+La planeación debe incluir:
+1. Aprendizajes esperados / competencias a desarrollar
+2. Materiales y recursos necesarios
+3. Actividad de diagnóstico (qué saben los alumnos antes)
+4. Desarrollo sesión por sesión con: inicio, desarrollo y cierre
+5. Estrategias de evaluación formativa y sumativa
+6. Actividades diferenciadas para alumnos con distintos ritmos de aprendizaje
+7. Formato listo para imprimir o presentar a dirección
+
+Dame la planeación completa y estructurada.`,
+
+  '2-2': (f) => `Soy docente de ${f.mt_2_2||'[MATERIA Y TEMA]'} en bachillerato.
+Tengo una clase de ${f.dur_2_2||'[DURACIÓN]'} minutos con ${f.al_2_2||'[N° ALUMNOS]'} alumnos.
+
+Diseña una secuencia de actividades completa con:
+INICIO (${Math.round((f.dur_2_2||50)*0.15)} min): Actividad motivadora o detonadora que active saberes previos
+DESARROLLO (${Math.round((f.dur_2_2||50)*0.65)} min): Actividad central con trabajo individual y en equipo
+CIERRE (${Math.round((f.dur_2_2||50)*0.20)} min): Reflexión, conclusiones y tarea significativa
+
+Incluye materiales necesarios y cómo evaluar informalmente el aprendizaje al final de la clase.`,
+
+  '2-3': (f) => `Soy docente de bachillerato tecnológico.
+Necesito ${f.cant_2_3||'[N° DE PREGUNTAS]'} preguntas detonadoras para iniciar el tema: "${f.tema_2_3||'[TEMA]'}", nivel ${f.nivel_2_3||'[NIVEL]'}.
+
+Las preguntas deben:
+1. Partir de la experiencia cotidiana del alumno
+2. Generar debate y reflexión, no respuesta de sí/no
+3. Conectar el tema con problemas reales de Chiapas o México cuando sea posible
+4. Ir de menor a mayor profundidad
+5. Incluir una sugerencia de cómo usar cada pregunta en el aula
+
+Dame las preguntas listas para usar.`,
+
+  '2-4': (f) => `Soy docente de ${f.mat_2_4||'[MATERIA]'} en bachillerato tecnológico.
+Necesito adaptar el tema "${f.tema_2_4||'[TEMA]'}" para distintos estilos de aprendizaje.
+
+Crea cuatro versiones de la misma explicación:
+1. VISUAL: con descripción de esquemas, diagramas o infografías que puedo dibujar en el pizarrón
+2. AUDITIVO: explicación oral estructurada con analogías y ritmo para escuchar
+3. KINESTÉSICO: actividad práctica o experimento sencillo con materiales de bajo costo
+4. LECTOR/ESCRITOR: resumen estructurado con definiciones y ejercicios escritos
+
+Incluye el tiempo estimado para cada versión.`,
+
+  '2-5': (f) => `Soy docente de bachillerato.
+Crea la letra de una canción didáctica sobre "${f.tema_2_5||'[TEMA]'}" con ritmo de ${f.ritmo_2_5||'[RITMO/GÉNERO]'}.
+
+La canción debe:
+1. Incluir los conceptos clave del tema de forma memorable
+2. Tener al menos 2 estrofas y un coro
+3. Usar lenguaje sencillo y cercano a los jóvenes de bachillerato
+4. Ser fácil de cantar o recitar en voz alta en el aula
+
+Al final incluye: los conceptos clave que cubre la canción y cómo usarla pedagógicamente.`,
+
+  '3-1': (f) => `Soy docente de ${f.mat_3_1||'[MATERIA]'} en bachillerato tecnológico.
+Te voy a compartir una imagen de mis apuntes o del libro de texto. A partir de ese material, genera un examen con ${f.num_3_1||'[N° PREGUNTAS]'} preguntas de tipo: ${f.tipo_3_1||'[TIPO]'}.
+
+El examen debe:
+1. Estar organizado por secciones con instrucciones claras
+2. Incluir el valor de cada sección y pregunta
+3. Tener un encabezado profesional (nombre, grupo, fecha, materia)
+4. Cubrir los conceptos principales del material de forma equilibrada
+5. Incluir un apartado de respuestas para el maestro al final
+
+[Adjunta la foto de tus apuntes o libro después de copiar este prompt]`,
+
+  '3-2': (f) => `Soy docente de ${f.mat_3_2||'[MATERIA]'} en bachillerato tecnológico.
+Te voy a compartir un texto o lectura. Conviértelo en una actividad completa de comprensión lectora de nivel ${f.dif_3_2||'[NIVEL]'}.
+
+La actividad debe incluir:
+1. Resumen del texto en máximo 5 líneas (para contextualizar al alumno)
+2. 5 preguntas literales (información explícita en el texto)
+3. 5 preguntas inferenciales (interpretar y analizar)
+4. 2 preguntas de valoración o reflexión personal
+5. Un ejercicio de vocabulario con 5 palabras clave del texto
+6. Instrucciones claras para el alumno
+
+[Adjunta el texto o lectura después de copiar este prompt]`,
+
+  '3-3': (f) => `Soy docente de bachillerato tecnológico.
+Genera un glosario de ${f.num_3_3||'[N° TÉRMINOS]'} términos clave del tema: "${f.tema_3_3||'[TEMA]'}".
+
+Para cada término incluye:
+1. Definición clara y accesible para bachillerato
+2. Ejemplo concreto o aplicación en la vida real
+3. Término relacionado o sinónimo
+4. Una pregunta de comprensión sobre ese término
+
+Al final, incluye un ejercicio de "une los términos con su definición" para evaluar el aprendizaje del glosario.`,
+
+  '3-4': (f) => `Explícame el concepto de "${f.conc_3_4||'[CONCEPTO]'}" como si tuviera 12 años, usando analogías del mundo de ${f.anal_3_4||'la vida cotidiana'}.
+
+La explicación debe:
+1. Partir de algo que cualquier adolescente conoce y entiende
+2. Usar máximo 200 palabras en la explicación principal
+3. Dar 3 ejemplos concretos y cotidianos
+4. Decirme qué es lo que NO es (para evitar confusiones comunes)
+5. Terminar con una pregunta que me ayude a saber si entendí
+
+Luego dame la versión técnica y formal del mismo concepto para que yo como docente pueda comparar.`,
+
+  '4-1': (f) => `Soy docente de ${f.mat_4_1||'[MATERIA]'} en bachillerato tecnológico.
+Un alumno me entregó una tarea sobre: "${f.tema_4_1||'[TEMA]'}".
+Sospecho que fue generada con IA y quiero verificar si realmente aprendió.
+
+Genera 5 preguntas orales de dificultad ${f.dif_4_1||'[DIFICULTAD]'} que:
+1. No puedan responderse con una búsqueda rápida en Google
+2. Requieran que el alumno explique con sus propias palabras
+3. Incluyan al menos 2 preguntas de aplicación práctica o situación real
+4. Sean progresivas: de menor a mayor profundidad
+5. Incluyan la respuesta esperada para que yo pueda evaluar
+
+Dame también una escala de valoración rápida (Excelente/Suficiente/Insuficiente) con criterios claros.`,
+
+  '4-2': (f) => `Soy docente de ${f.mat_4_2||'[MATERIA]'} en bachillerato tecnológico.
+Necesito una rúbrica de evaluación por competencias para: "${f.prod_4_2||'[PRODUCTO A EVALUAR]'}", con ${f.crit_4_2||'[N° CRITERIOS]'} criterios.
+
+La rúbrica debe:
+1. Tener 4 niveles de desempeño: Excelente (4), Bueno (3), Suficiente (2), Insuficiente (1)
+2. Describir con claridad qué hace el alumno en cada nivel
+3. Incluir criterios de contenido, presentación, originalidad y habilidades
+4. Sumar 100 puntos en total
+5. Ser fácil de usar en el aula (que el alumno también pueda autoevaluarse con ella)
+
+Dame la rúbrica en formato de tabla clara y lista para imprimir.`,
+
+  '4-3': (f) => `Soy docente de bachillerato tecnológico.
+Crea un banco de ${f.tot_4_3||'[N° PREGUNTAS]'} preguntas de ${f.tipo_4_3||'[TIPO]'} sobre el tema: "${f.mt_4_3||'[MATERIA Y TEMA]'}".
+
+Organiza las preguntas en 3 niveles de dificultad:
+- Básico (recordar y comprender): 40% de las preguntas
+- Intermedio (aplicar y analizar): 40%
+- Avanzado (evaluar y crear): 20%
+
+Para cada pregunta incluye:
+1. La pregunta con las opciones (si aplica)
+2. La respuesta correcta
+3. Breve explicación de por qué es correcta
+4. Nivel de dificultad
+
+Dame el banco completo listo para usarse como examen o repaso.`,
+
+  '4-4': (f) => `Soy docente de ${f.mat_4_4||'[MATERIA]'} en bachillerato tecnológico.
+Necesito un instrumento de coevaluación entre pares para la actividad: "${f.proy_4_4||'[PROYECTO/ACTIVIDAD]'}".
+
+El instrumento debe:
+1. Ser breve (máximo 1 página) y fácil de entender para los alumnos
+2. Evaluar a cada compañero de equipo con criterios claros
+3. Incluir: participación, calidad del trabajo, actitud y comunicación
+4. Tener escala del 1 al 5 con descripción de cada nivel
+5. Tener un espacio para retroalimentación escrita (2-3 líneas)
+6. Incluir instrucciones claras de cómo llenarlo
+
+Dame el formato listo para imprimir y repartir en clase.`,
+
+  '5-1': (f) => `Hola, soy alumno de bachillerato. Tengo que hacer ${f.tipo_5_1||'un trabajo'} sobre: "${f.tema_5_1||'[TEMA]'}" para la materia de ${f.mat_5_1||'[MATERIA]'}.
+
+Quiero que hagas DOS cosas al mismo tiempo:
+
+1. TAREA: Genera el ${f.tipo_5_1||'trabajo'} completo y bien desarrollado sobre el tema
+2. GUÍA DE ESTUDIO: En una hoja aparte, dame un resumen de todos los conceptos clave que debo entender para que mi maestro me pregunte cualquier cosa y yo pueda responder con mis propias palabras
+
+La guía de estudio debe tener:
+- Los 10 conceptos más importantes del tema con explicación sencilla
+- 5 preguntas que mi maestro me podría hacer en un examen oral
+- Una forma de recordar fácilmente lo más importante
+
+Quiero aprender de verdad, no solo entregar la tarea.`,
+
+  '5-2': (f) => `Quiero practicar para mi examen de ${f.mat_5_2||'[MATERIA]'} sobre el tema: "${f.tema_5_2||'[TEMA]'}".
+
+Actúa como mi maestro y ponme a prueba de la siguiente manera:
+1. Hazme una pregunta a la vez, espera mi respuesta antes de continuar
+2. Si respondo bien, felicítame brevemente y pasa a la siguiente
+3. Si respondo mal o incompleto, explícame por qué y dame la respuesta correcta antes de continuar
+4. Al final dame una calificación del 0 al 10 con retroalimentación de mis puntos débiles
+
+Empieza cuando yo te diga "¡Listo!" y hazme la primera pregunta.`,
+
+  '5-3': (f) => `Soy alumno de bachillerato, materia de ${f.mat_5_3||'[MATERIA]'}.
+Cometí un error en un ejercicio de ${f.ej_5_3||'[TIPO DE EJERCICIO]'}.
+
+Te voy a mostrar mi solución con el error. Necesito que:
+1. Identifiques exactamente en qué paso me equivoqué
+2. Me expliques POR QUÉ es un error (no solo dónde)
+3. Me muestres el procedimiento correcto paso a paso
+4. Me des 2 ejercicios similares para que practique y no vuelva a cometer el mismo error
+
+[Escribe aquí tu ejercicio con el error después de copiar este prompt]`,
+
+  '5-4': (f) => `Soy alumno de bachillerato.
+Crea un ${f.fmt_5_4||'mapa conceptual'} completo del tema: "${f.tema_5_4||'[TEMA]'}".
+
+El esquema debe:
+1. Mostrar los conceptos principales y su relación entre sí
+2. Ir de lo general a lo específico
+3. Usar palabras conectoras que expliquen la relación entre conceptos
+4. Ser claro y fácil de copiar en mi cuaderno
+5. Incluir máximo 20 elementos (no quiero que sea demasiado largo)
+
+Al final, dame 3 preguntas cortas para verificar que entendí el mapa.`,
+
+  '6-1': (f) => `Tengo un problema técnico en el aula con mi proyector marca ${f.marca_6_1||'[MARCA]'}.
+El problema es: ${f.prob_6_1||'[PROBLEMA]'}.
+
+Necesito una guía de solución paso a paso que:
+1. Empiece por las causas más comunes y fáciles de resolver
+2. Tenga pasos numerados y muy claros (sin tecnicismos)
+3. Me diga qué debo verificar físicamente primero (cables, enchufes, botones)
+4. Incluya qué hacer si ningún paso funciona (a quién llamar, qué reportar)
+5. Sea lo suficientemente sencilla para que cualquier docente la siga
+
+Dame la guía de troubleshooting completa y práctica.`,
+
+  '6-2': (f) => `Tengo un problema de conexión WiFi en el aula.
+Sistema operativo: ${f.os_6_2||'[SISTEMA OPERATIVO]'}
+Síntoma: ${f.sint_6_2||'[SÍNTOMA]'}
+
+Dame una guía de solución paso a paso que:
+1. Empiece por los pasos más sencillos (no requieren conocimientos técnicos)
+2. Incluya capturas de pantalla descritas (dónde hacer clic exactamente)
+3. Tenga máximo 8 pasos ordenados del más fácil al más complejo
+4. Me diga qué información debo darle al técnico si no lo resuelvo solo
+5. Sea ejecutable en menos de 10 minutos
+
+Dame la guía completa y práctica.`,
+
+  '6-3': (f) => `Tengo problemas con el programa "${f.prog_6_3||'[PROGRAMA]'}" en mi computadora del aula.
+${f.err_6_3 ? `Mensaje de error: "${f.err_6_3}"` : 'No aparece mensaje de error, simplemente no abre.'}
+
+Necesito una guía de solución paso a paso que:
+1. Identifique las causas más comunes de este tipo de error
+2. Me explique cómo solucionarlo sin necesitar soporte técnico externo
+3. Incluya pasos concretos con lenguaje no técnico
+4. Me diga cómo prevenir que vuelva a ocurrir
+5. Incluya qué información recopilar si necesito reportarlo a soporte
+
+Dame la guía completa y práctica.`,
+
+  '6-4': (f) => `Tengo problemas con mi impresora ${f.marca_6_4||'[MARCA]'} conectada por ${f.con_6_4||'[TIPO DE CONEXIÓN]'}.
+Problema: ${f.prob_6_4||'[PROBLEMA]'}.
+
+Dame una guía de diagnóstico y solución que:
+1. Empiece verificando lo más básico (conexiones, tóner, papel)
+2. Tenga pasos numerados y claros para cualquier docente
+3. Incluya cómo acceder a la configuración de impresora en mi equipo
+4. Me diga cuándo es momento de llamar a soporte técnico
+5. Sea ejecutable en menos de 15 minutos
+
+Dame la guía completa paso a paso.`,
+
+  '7-1': (f) => `Soy docente de ${f.mat_7_1||'[MATERIA]'} y quiero crear un cortometraje educativo sobre la zona arqueológica de ${f.zona_7_1||'[ZONA ARQUEOLÓGICA]'}, Chiapas, con duración de ${f.dur_7_1||'[DURACIÓN]'} minutos.
+
+Genera el guion completo organizado en escenas de máximo 6 segundos cada una, listo para producir con herramientas de IA (generadores de imagen y video).
+
+Para cada escena incluye:
+1. NÚMERO DE ESCENA y tiempo aproximado
+2. DESCRIPCIÓN VISUAL detallada (para generar la imagen con IA): iluminación, ángulo, elementos, colores
+3. NARRACIÓN en voz en off (texto exacto para audio)
+4. DURACIÓN estimada en segundos
+
+Al final incluye:
+- Lista de prompts de imagen listos para usar en Midjourney o DALL-E
+- Sugerencia de música de fondo
+- Cómo usar este video como herramienta de aprendizaje en clase`,
+
+  '7-2': (f) => `Soy docente de ${f.mat_7_2||'[MATERIA]'} en bachillerato tecnológico.
+Crea una historia interactiva de ${f.ep_7_2||'[N° EPISODIOS]'} episodios sobre: "${f.tema_7_2||'[TEMA]'}", donde el alumno toma decisiones que afectan el rumbo de la historia.
+
+Estructura de cada episodio:
+1. Narración de la situación (máximo 150 palabras)
+2. El alumno enfrenta un DILEMA o DECISIÓN relacionada con el tema
+3. Dos o tres opciones de respuesta
+4. Consecuencias breves de cada decisión (el maestro las revela en la siguiente sesión)
+
+Al final del último episodio:
+- Evaluación de los conceptos del tema aprendidos a través de la historia
+- 5 preguntas de reflexión sobre las decisiones tomadas
+- Cómo conectar la historia con el currículum oficial
+
+Haz la historia emocionante, con personajes reales y contexto chiapaneco cuando sea posible.`,
+
+  '7-3': (f) => `Soy docente de bachillerato.
+Crea una trivia/juego de preguntas para repasar el tema: "${f.mt_7_3||'[MATERIA Y TEMA]'}", con ${f.num_7_3||'[N° PREGUNTAS]'} preguntas en formato: ${f.fmt_7_3||'[FORMATO]'}.
+
+Las preguntas deben:
+1. Cubrir todos los conceptos clave del tema
+2. Tener diferentes niveles de dificultad (fácil, media, difícil)
+3. Ser entretenidas y provocar debate o sorpresa
+4. Incluir una respuesta completa para el docente
+
+Además dame:
+- Instrucciones para jugar en clase (dinámica con equipos)
+- Sistema de puntuación sugerido
+- Cómo premiar a los ganadores de forma creativa sin gastar dinero
+
+Que sea divertido y que los alumnos quieran repetirlo.`,
+
+
+  '8-1': (f) => `Soy docente de ${f.mat_8_1||'[MATERIA]'} en bachillerato tecnológico.
+Tengo un ${f.tipo_8_1||'[TIPO DE TRABAJO]'} que presenta señales de haber sido generado con IA. Nivel de sospecha: ${f.nivel_8_1||'[NIVEL]'}.
+
+Necesito que me ayudes a hacer un análisis docente del trabajo. Voy a pegarlo a continuación.
+
+Analiza el texto y dime:
+1. SEÑALES DETECTADAS: lista de indicios que sugieren uso de IA (vocabulario, estructura, estilo, longitud, ausencia de voz personal)
+2. SEÑALES NEUTRAS: elementos que no son concluyentes en ninguna dirección
+3. SEÑALES DE AUTORÍA: partes que parecen escritas por el alumno genuinamente
+4. VEREDICTO PRELIMINAR: Verde (probablemente original), Amarillo (dudoso), Rojo (alta probabilidad de IA)
+5. 3 PREGUNTAS ORALES específicas sobre este texto que solo alguien que lo hizo podría responder fácilmente
+
+⚠️ Recuerda: el análisis es orientativo. La evaluación final la hace el docente.
+
+[PEGA AQUÍ EL TRABAJO DEL ALUMNO]`,
+
+  '8-2': (f) => `Soy docente de ${f.mat_8_2||'[MATERIA]'} en bachillerato tecnológico.
+Un alumno entregó un trabajo sobre: "${f.tema_8_2||'[TEMA]'}".
+Quiero verificar si realmente lo comprendió, sin acusarlo directamente.
+
+Genera ${f.num_8_2||'5'} preguntas de verificación con enfoque en: ${f.enf_8_2||'comprensión del contenido'}.
+
+Las preguntas deben:
+1. Ser conversacionales, no intimidantes (no parecen examen)
+2. Requerir que el alumno explique con SUS PROPIAS PALABRAS
+3. No poder responderse memorizando el texto entregado
+4. Incluir al menos una pregunta de aplicación real o cotidiana
+5. Ordenarse de menos a más exigente
+
+Para cada pregunta incluye:
+- La pregunta exacta que le haría al alumno
+- Qué respuesta esperarías de alguien que SÍ aprendió
+- Qué respuesta daría alguien que NO leyó/procesó el tema
+- Cómo interpretar una respuesta vaga o incompleta
+
+Dame las ${f.num_8_2||'5'} preguntas listas para usar en una conversación de 10 minutos.`,
+
+  '8-3': (f) => `Soy docente de ${f.mat_8_3||'[MATERIA]'} en bachillerato tecnológico.
+Un alumno entregó un trabajo sobre: "${f.tema_8_3||'[TEMA]'}".
+Tengo ${f.tiempo_8_3||'15'} minutos para aplicar una verificación escrita individual.
+
+Genera un cuestionario de verificación corto con:
+- INSTRUCCIONES claras para el alumno (tono directo pero no amenazante)
+- 5 preguntas abiertas que requieran respuesta escrita con sus propias palabras
+- Las preguntas NO deben poder responderse copiando el texto original
+- Deben cubrir: idea principal, detalles clave, opinión personal, aplicación práctica y una pregunta sorpresa del tema
+
+Para el docente incluye:
+- Respuesta esperada de cada pregunta (breve)
+- Criterio de evaluación rápido: Completo / Parcial / Insuficiente
+- Qué hacer si el alumno no puede responder ni la mitad
+
+Tiempo de aplicación estimado: ${f.tiempo_8_3||'15'} minutos. Formato listo para imprimir.`,
+
+  '8-4': (f) => `Soy docente de ${f.mat_8_4||'[MATERIA]'} en bachillerato.
+Detecté señales de que un alumno entregó un trabajo generado con IA sin procesarlo.
+Perfil del alumno: ${f.perfil_8_4||'[PERFIL]'}.
+
+Quiero dar una retroalimentación formativa, sin acusar ni sancionar directamente.
+
+Necesito:
+1. UN MENSAJE para decirle al alumno en privado (máximo 5 oraciones, tono firme pero constructivo)
+2. UNA NUEVA TAREA que lo obligue a demostrar que aprendió: incluye tanto la entrega original mejorada como una guía de estudio de una hoja con los conceptos clave
+3. CRITERIOS DE EVALUACIÓN para la nueva entrega (qué se califica y cómo)
+4. PREGUNTAS DE SEGUIMIENTO que le harás cuando entregue la nueva versión
+5. UN GUIÓN de cómo iniciar la conversación con el alumno sin que se sienta atacado
+
+El objetivo es que el alumno entienda que el problema no es usar IA, sino no aprender con ella.`
+
+
+  '7-4': (f) => `Soy docente de bachillerato tecnológico.
+Diseña un proyecto integrador por competencias que combine las materias de ${f.mats_7_4||'[MATERIAS]'}, abordando la problemática: "${f.prob_7_4||'[PROBLEMÁTICA]'}", con duración de ${f.sem_7_4||'[DURACIÓN]'} semanas.
+
+El proyecto debe incluir:
+1. Nombre creativo del proyecto y justificación
+2. Competencias que desarrolla por materia
+3. Producto final esperado (tangible o digital)
+4. Cronograma semanal de actividades con responsables
+5. Cómo integrar herramientas de IA en el proceso
+6. Criterios de evaluación y rúbrica simplificada
+7. Cómo presentar el proyecto ante la comunidad escolar
+
+Que sea un proyecto real, que resuelva un problema de Chiapas y que los alumnos se sientan orgullosos de presentar.`,
+};
+
+// ── GENERATE PROMPT ───────────────────────────────────────
+const generated = {};
+
+function getFields(id) {
+  const card = document.querySelector(`#prev-${id}`).closest('.prompt-card');
+  const inputs = card.querySelectorAll('input, select');
+  const f = {};
+  inputs.forEach(inp => {
+    const key = inp.dataset.field;
+    if (key) f[key] = inp.value.trim();
+  });
+  return f;
+}
+
+function generate(id) {
+  const f = getFields(id);
+  const text = templates[id] ? templates[id](f) : '(Prompt no disponible)';
+  generated[id] = text;
+  const pre = document.getElementById(`prev-${id}`);
+  pre.textContent = text;
+  pre.classList.add('visible');
+}
+
+// ── COPY ─────────────────────────────────────────────────
+function copyPrompt(id) {
+  const text = generated[id];
+  if (!text) { showToast('⚡ Primero genera el prompt'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(`copy-${id}`);
+    btn.textContent = '✅ Copiado';
+    btn.classList.add('copied');
+    showToast('✅ ¡Prompt copiado!');
+    setTimeout(() => {
+      btn.textContent = '📋 Copiar';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// ── OPEN IN AI ────────────────────────────────────────────
+function openInAI(id, tool) {
+  const text = generated[id];
+  if (!text) { showToast('⚡ Primero genera el prompt'); return; }
+  const encoded = encodeURIComponent(text);
+  const urls = {
+    chatgpt: `https://chatgpt.com/?q=${encoded}`,
+    claude:  `https://claude.ai/new?q=${encoded}`,
+    perp:    `https://www.perplexity.ai/?q=${encoded}`,
+    gemini:  `https://gemini.google.com/app?q=${encoded}`,
+  };
+  window.open(urls[tool] || urls.chatgpt, '_blank');
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+
+
+// ── SWITCH TABS DETECTOR ─────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.detect-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.detect-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── SCROLL ANIMATION ─────────────────────────────────────
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'none';
+    }
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
